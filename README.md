@@ -9,7 +9,7 @@
 * 主要使用和學習類神經網路和倒傳遞
 * `midterm.py` 是類神經網路的初次實作
 * `midterm_1.py` 主要是將`midterm.py`的實作再加上one hot encoding，以增加class的識別率
-*  `homework_to_exam.py` 主要將softmax以及cross entropy的概念加進來，用來預習作業(依舊使用iris集合)
+*  `homework_to_exam.py` 主要將softmax以及cross entropy的概念加進來，用來預習期末作業(依舊使用iris集合)
 
 ## 期末作業 (灰階圖片(.bmp)的分類問題)
 
