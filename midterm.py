@@ -31,25 +31,24 @@ def perceptron():
             MSE = 0
             for i in range(0, 75):
                 t = t_list[i%3]
-
                 inp = inp_train[i, :]
 
-                SUMhid = np.dot(inp, Whid)
+                SUMhid = inp @ Whid
                 Ahid = logsig(SUMhid)
 
-                SUMout = np.dot(Ahid, Wout)
+                SUMout = Ahid @ Wout
                 Aout = SUMout
 
                 MSE += (1 - Aout[0]) ** 2
 
-                DELTAout = (t - Aout[0])*1
+                DELTAout = (t - Aout[0]) * 1    # 這裡的1指得是dpuline()的結果
                 DELTAhid = DELTAout*Wout
 
                 Wout = Wout + (DELTAout*Ahid).reshape(neuronNumber, 1)
 
                 DELTA_dlogsig = (DELTAhid*(dlogsig(Ahid).reshape(Ahid.shape[0], 1))).reshape(1, DELTAhid.shape[0])
                 DELTA_dlogsig = np.repeat(DELTA_dlogsig[0:1], inp.shape[0], axis=0)
-                inp = inp.reshape(inp.shape[0], 1)
+                inp = inp.reshape(-1, 1)
                 inp = np.repeat(inp[:, 0:1], neuronNumber, axis=1)
 
                 Whid = Whid + DELTA_dlogsig*inp

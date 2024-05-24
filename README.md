@@ -2,14 +2,14 @@
 
 > [!NOTE] 
 > 1. 需要注意，這裡面隱藏層只有用一層的神經元
-> 2. 程式碼的簡潔程度依據 期中->期末 的順序變得越來越簡潔，所以想看護眼睛的，可以往後看
+> 2. 第一次作業的程式碼有點醜，所以想看護眼睛的，可以往後看
 
 ## 期中作業 (iris集合的分類問題)
 
 * 主要使用和學習類神經網路和倒傳遞
 * `midterm.py` 是類神經網路的初次實作
-* `midterm_1.py` 主要是將`midterm.py`的實作再加上one hot encoding，以增加class的識別率
-*  `homework_to_exam.py` 主要將softmax以及cross entropy的概念加進來，用來預習期末作業(依舊使用iris集合)
+* `midterm_1.py` 主要是將`midterm.py`的實作再加上one hot encoding和softmax，以增加class的識別率
+*  `homework_to_exam.py` 主要將cross entropy的概念加進來，用來預習期末作業(依舊使用iris集合)
 
 ## 期末作業 (灰階圖片(.bmp)的分類問題)
 

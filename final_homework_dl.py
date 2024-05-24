@@ -91,7 +91,6 @@ def perceptron():
                 continue
 
             img_ind = int(f.split('.')[0])
-            folder_ind = int(root.split('\\')[1])
 
             full_path = os.path.join(root, f)
             with Image.open(full_path) as img:
@@ -119,7 +118,7 @@ def perceptron():
     Wout = np.random.normal(0, 0.1, size=(neuronNumber_hid, neuronNumber_out))
 
     # 訓練模型
-    RMSE_list = []
+    cross_entropy_list = []
     for round in range(epoch):
         cross_entropy = 0
 
@@ -132,13 +131,13 @@ def perceptron():
                 SUMout = Ahid @ Wout
                 Aout = softmax(SUMout)
 
-                # print(int(i/5), np.argmax(Aout))
+                # 計算cross entropy
                 cross_entropy += -np.log(Aout[int(i/5)])
 
                 # 以下是倒傳遞的過程
                 DELTAout = Aout.copy()
                 DELTAout[int(i / 5)] -= 1
-                # 這裡要注意，因為之前是負梯度，所以直接加上去就可以了，這次的值是正的，所以要加負號
+                # 這裡要注意，原先因為是負梯度，所以直接加上去就可以了，這次的值是正的，所以要加負號
                 DELTAout = -1 * DELTAout
                 DELTAhid = DELTAout @ Wout.T * dlogsig(Ahid)
 
@@ -152,7 +151,7 @@ def perceptron():
                 Wout += np.outer(Ahid, DELTAout * learning_rate)
                 Whid += np.outer(inp, DELTAhid * learning_rate)
 
-        RMSE_list.append(cross_entropy/total_data_num)
+        cross_entropy_list.append(cross_entropy/total_data_num)
         print(f"Round {round+1} cross_entropy: {cross_entropy/total_data_num:.{3}f}")
 
     # 驗證模型
@@ -175,7 +174,7 @@ def perceptron():
     print(f"符合率: {success_rate*100:.{2}f}%")
 
     # 繪製折線圖
-    plt.plot(range(len(RMSE_list)), RMSE_list, marker='.', linestyle='-')
+    plt.plot(range(len(cross_entropy_list)), cross_entropy_list, marker='.', linestyle='-')
 
     # 添加標題和標籤
     plt.title('Line Chart')

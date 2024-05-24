@@ -35,28 +35,23 @@ def perceptron():
                 t = t_matrix[i%3: i%3+1]
                 inp = inp_train[i, :]
 
-                SUMhid = np.dot(inp, Whid)
+                SUMhid = inp @ Whid
                 Ahid = logsig(SUMhid)
 
-                SUMout = np.dot(Ahid, Wout)
+                SUMout = Ahid @ Wout
                 Aout = softmax(SUMout)
 
                 MSE += (Aout - t) ** 2
 
-                # print(Aout)
-
-                Aout[i%3] = Aout[i%3] - 1
-                DELTAout = Aout.reshape(1, Aout.shape[0])
-                DELTAhid = np.dot(Wout, DELTAout.reshape(DELTAout.shape[1], 1))
+                DELTAout = Aout.copy()
+                DELTAout[i % 3] -= 1
+                # 這裡要注意，因為之前是負梯度，所以直接加上去就可以了，這次的值是正的，所以要加負號
+                DELTAout = -1 * DELTAout
+                DELTAhid = DELTAout @ Wout.T * dlogsig(Ahid)
 
                 # 這裡要注意，因為之前是負梯度，所以直接加上去就可以了，這次的值是正的，所以要用減的
-                Wout = Wout - np.tile(Ahid.reshape(Ahid.shape[0], 1), (1, neuronNumber_out)) * \
-                                np.tile(DELTAout[0], (neuronNumber_hid, 1))
-                DELTA_dlogsig = DELTAhid * dlogsig(Ahid.reshape(Ahid.shape[0], 1))
-                DELTA_dlogsig_reshape = DELTA_dlogsig.reshape(1, DELTA_dlogsig.shape[0])
-                inp_reshape = inp.reshape(inp.shape[0], 1)
-                Whid = Whid - np.tile(DELTA_dlogsig_reshape, (inp.shape[0], 1)) * \
-                       np.tile(inp_reshape, (1, neuronNumber_hid))
+                Wout += np.outer(Ahid, DELTAout)
+                Whid += np.outer(inp, DELTAhid)
 
 
             print(MSE[0, 2])
