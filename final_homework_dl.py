@@ -2,7 +2,6 @@ import numpy as np
 import matplotlib.pyplot as plt
 from PIL import Image
 import os
-import pandas as pd
 
 def logsig(x):
     return 1/(1+np.exp(-x))
@@ -65,8 +64,8 @@ class PCA:
 
 def perceptron():
     folder_num = 40
-    epoch = 100
-    learning_rate = 0.05
+    epoch = 150
+    learning_rate = 0.1
     dataNum_each_Class = 5
 
     total_data_num = folder_num * dataNum_each_Class

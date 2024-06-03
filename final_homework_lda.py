@@ -1,8 +1,7 @@
 import numpy as np
 from PIL import Image
 import os
-from scipy.spatial.distance import cdist
-
+import matplotlib.pyplot as plt
 
 class PCA:
     def __init__(self, n_components):
@@ -76,14 +75,52 @@ class LDA:
         return lda_projections
 
 
+def euclidean_distance(vector, matrix):
+    dis = []
+    for i in range(matrix.shape[0]):
+        dis.append([np.sqrt(np.sum((vector - matrix[i]) ** 2)), i])
+
+    min_ind = -1
+    min_val = float("inf")
+    for i in range(len(dis)):
+        if dis[i][0] < min_val:
+            min_ind = dis[i][1]
+            min_val = dis[i][0]
+
+    return min_ind
+
+# 將結果3D視覺化
+class Visual:
+    def __init__(self, folder_num):
+        # 創建一個3D圖形
+        self.fig = plt.figure()
+        self.ax = self.fig.add_subplot(projection='3d')
+
+        # 創建一個列表來存儲每個點的顏色
+        self.colors = np.random.rand(folder_num, 3)  # 生成隨機RGB顏色值
+
+        # 設置坐標軸標籤
+        self.ax.set_xlabel('X')
+        self.ax.set_ylabel('Y')
+        self.ax.set_zlabel('Z')
+
+    # 將點分配到空間上
+    def set_point(self, x, y, z, color, cls):
+        self.ax.scatter(x, y, z, c=self.colors[color], label=f'Class {cls}')
+
+    # 展示圖像
+    def show(self):
+        plt.show()
+
 def run():
     folder_num = 40
     dimension = 200     # 此處也是降維後的維度
-    lda_dimension = 65
+    lda_dimension = 200
     dataNum_each_Class = 5
     total_data_num = folder_num * dataNum_each_Class
 
     pca = PCA(n_components=dimension)
+    pca_3D = PCA(n_components=3)
 
     train_set = []
     test_set = []
@@ -120,28 +157,37 @@ def run():
 
     lda = LDA(train_set, dimension, folder_num, lda_dimension)
     lda_projection = lda.fit_transform()
-    train_set = train_set @ lda_projection
-    test_set = test_set @ lda_projection
+    train_set_projected = train_set @ lda_projection
+    test_set_projected = test_set @ lda_projection
 
-    train_mean_set = []
-    for i in range(0, total_data_num, 5):
-        train_mean_set.append(np.mean(train_set[i:i+5, :], axis=0))
+    pca_3D.pre_calculation(train_set_projected)
+    train_set_projected_3D = pca_3D.fit_transform(train_set_projected)
+    test_set_projected_3D = pca_3D.fit_transform(test_set_projected)
+
+    # 可視化結果
+    vis = Visual(folder_num)
 
     counter = 0
     for i in range(total_data_num):
         # 計算每個向量與q的歐式距離
-        distances = cdist(train_set, [test_set[i]], 'euclidean')
+        dis = euclidean_distance(test_set_projected[i], train_set_projected)
 
-        # 找出最近的row index
-        nearest_idx = np.argmin(distances)
+        vis.set_point(train_set_projected_3D[i, 0], train_set_projected_3D[i, 1], train_set_projected_3D[i, 2],
+                   int(i/5), int(i/5))
+        vis.set_point(test_set_projected[i, 0], test_set_projected[i, 1], test_set_projected[i, 2],
+                      int(dis / 5), int(dis / 5))
 
-        if int(nearest_idx/5) == int(i/5):
+        if int(dis/5) == int(i/5):
             counter += 1
 
-    # print(counter)
+    # 顯示符合率
+    print(counter)
     success_rate = counter / total_data_num
     print(f"符合率: {success_rate * 100:.{2}f}%")
 
+    # 顯示圖形
+    # 注意：全部的點都印的話，會超爆卡的
+    vis.show()
 
 if __name__ == "__main__":
     run()
